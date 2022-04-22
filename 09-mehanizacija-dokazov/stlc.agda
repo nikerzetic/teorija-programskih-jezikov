@@ -59,6 +59,54 @@ subst σ (IF M THEN M₁ ELSE M₂) = IF (subst σ M) THEN (subst σ M₁) ELSE 
 subst σ (M ∙ N) = (subst σ M) ∙ subst σ N
 subst σ (ƛ {A = A} M) = ƛ (subst {!   !} M)
 
+ext : {Γ Δ : Ctx}
+    → ({A : Ty} → A ∈ Γ → A ∈ Δ)
+    ----------------------------
+    → {A B : Ty} → A ∈ (Γ , B) → A ∈ (Δ , B)
+ext σ Z = {!   !}
+ext σ (S inG) = {!   !}
+
+rename : {Γ Δ : Ctx}
+    → ({A : Ty} → A ∈ Γ → A ∈ Δ)
+    ----------------------------
+    → {A : Ty} → Γ ⊢ A → Δ ⊢ A
+rename σ (VAR x) = {!σ x   !}
+rename σ TRUE = {!   !}
+rename σ FALSE = {!   !}
+rename σ (IF x THEN x₁ ELSE x₂) = {!   !}
+rename σ (x ∙ x₁) = {!   !}
+rename σ (ƛ x) = {!   !}
+
+exts : {Γ Δ : Ctx}
+    → ( {A : Ty}      → A ∈ Γ      → Δ ⊢ A )
+    -----------------------------------------
+    → {A B : Ty} → A ∈ (Γ , B) → (Δ , B) ⊢ A
+exts σ Z = VAR Z
+exts σ (S inG) = rename S (σ inG)
+
+substiMulti : {Γ Δ : Ctx}
+    → ({A : Ty} → A ∈ Γ → Δ ⊢ A)
+    -----------------------------
+    → {A : Ty} → Γ ⊢ A → Δ ⊢ A
+substiMulti σ (VAR x) = σ x
+substiMulti σ TRUE = TRUE
+substiMulti σ FALSE = FALSE
+substiMulti σ (IF hasT THEN hasT₁ ELSE hasT₂) = 
+    IF (substiMulti σ hasT) THEN (substiMulti σ hasT₁) ELSE (substiMulti σ hasT₂)
+substiMulti σ (hasT₁ ∙ hasT₂) = (substiMulti σ hasT₁) ∙ (substiMulti σ hasT₂)
+substiMulti σ (ƛ hasT) = ƛ (substiMulti (exts σ) hasT)
+
+_[_] : {Γ : Ctx} {A B : Ty}
+    → (Γ , B) ⊢ A
+    → Γ ⊢ B
+    --------
+    → Γ ⊢ A
+_[_] {Γ} {B = B} N M = substiMulti σ N
+    where
+        σ : ∀ { A : Ty} → A ∈ (Γ , B) → Γ ⊢ A
+        σ Z = M
+        σ (S inC) = VAR inC
+
 data value : {Γ : Ctx} {A : Ty} → Γ ⊢ A → Set where
     value-TRUE : {Γ : Ctx} →
         ----------------

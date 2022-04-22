@@ -18,7 +18,7 @@ ocamlc -g syntax.ml parser.ml interpreter.ml interpreterLazy.ml typechecker.ml m
 Če ste si OCaml namestili na sistemu Windows s pomočjo `fdopen` namesto `ocamlc` uporabite (kjer pot do ocamlc ustrezno zamenjate z veljavno potjo na vašem računalniku):
 
 ```
-C:\OCaml64\usr\local\bin\ocaml-env.exe exec -- C:\OCaml64\home\???\.opam\4.12.0+mingw64c\bin\ocamlc.exe
+C:\OCaml64\usr\local\bin\ocaml-env.exe exec -- C:\OCaml64\home\Nik\.opam\4.07.1+mingw64c\bin\ocamlc.exe -g syntax.ml parser.ml interpreter.ml interpreterLazy.ml typechecker.ml miniml.ml -O2 -o miniml.exe
 ```
 
 Če se vam zdi končni program počasen lahko namesto ocamlc uporabite `ocamlopt`, ki pa bo za prevajanje potreboval več časa.
